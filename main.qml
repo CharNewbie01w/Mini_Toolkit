@@ -13,6 +13,8 @@ FluWindow {
     property bool appBarVisible: true
     property int windowWidth: 500
     property int windowHeight: 270
+    property bool nativeText: false
+    property bool darkMode: false
     width: windowWidth
     height: windowHeight
     closeDestory: false
@@ -27,7 +29,13 @@ FluWindow {
 
     Image {
         id: background_image
+        visible: !window.darkMode
         source: "qrc:/res/image/background.png"
+    }
+    Image {
+        id: background_dark
+        visible: window.darkMode
+        source: "qrc:/res/image/background_dark.png"
     }
 
     DataModel {
@@ -76,10 +84,10 @@ FluWindow {
     }
 
     FluAcrylic {
-        target: background_image
+        target: window.darkMode ? background_dark : background_image
         radius: [6,6,6,6]
         tintColor: "#FFFFFFFF"
-        tintOpacity: 0.72
+        tintOpacity: window.darkMode ? 0.10 : 0.72
         blurRadius: 72
         width: 490
         height: 233
@@ -487,6 +495,9 @@ FluWindow {
                 contentItem: FluArea {
                     FluButton {
                         text: "发送信号"
+                        x: 9
+                        y: 9
+
                         onClicked: {
                             setDataSignal("testTitle", "testText");
                             console.log(data_model.data["testTitle"]);
@@ -497,7 +508,56 @@ FluWindow {
             FluPivotItem {
                 title: " 设置 "
                 contentItem: FluArea {
+                    FluText {
+                        text: "个性化: "
+                        font.pointSize: 13
+                        x: 9
+                        y: 9
+                    }
 
+                    FluText {
+                        text: "Native文本渲染"
+                        font.pointSize: 11
+                        x: 12
+                        y: 60
+                    }
+
+                    FluToggleSwitch {
+                        checked: window.nativeText
+                        x: 12
+                        y: 84
+
+                        onClicked: {
+                            FluTheme.nativeText = checked;
+                            setDataSignal("nativeText", checked);
+                        }
+                    }
+
+                    FluText {
+                        text: "深色模式"
+                        font.pointSize: 11
+                        x: 12
+                        y: 112
+                    }
+
+                    FluToggleSwitch {
+                        checked: window.darkMode
+                        x: 12
+                        y: 136
+
+                        onClicked: {
+                            if (FluTheme.dark)
+                            {
+                                FluTheme.darkMode = FluThemeType.Light;
+                            }
+                            else
+                            {
+                                FluTheme.darkMode = FluThemeType.Dark;
+                            }
+                            window.darkMode = checked;
+                            setDataSignal("darkMode", checked);
+                        }
+                    }
                 }
             }
         }
@@ -508,6 +568,7 @@ FluWindow {
         window.onRemoveAppSignal.connect(launcher.removeAppSlot);
         window.onStartAppSignal.connect(launcher.startSlot);
         window.onSetDataSignal.connect(data_model.setDataSlot);
+
         launcher.appList = data_model.data["appList"];
         var keys = launcher.getAppNames();
         for (var i = 0; i < keys.length; i++)
@@ -515,7 +576,17 @@ FluWindow {
             gameList.append( {text: keys[i]} );
         }
 
-//        console.log(keys);
+        window.nativeText = data_model.data["nativeText"];
+        FluTheme.nativeText = window.nativeText;
+        window.darkMode = data_model.data["darkMode"];
+        if (window.darkMode)
+        {
+            FluTheme.darkMode = FluThemeType.Dark;
+        }
+        else
+        {
+            FluTheme.darkMode = FluThemeType.Light;
+        }
     }
 
     closeFunc: function(event) {

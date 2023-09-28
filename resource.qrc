@@ -3,5 +3,6 @@
         <file>res/image/favicon.png</file>
         <file>res/image/favicon.ico</file>
         <file>res/image/background.png</file>
+        <file>res/image/background_dark.png</file>
     </qresource>
 </RCC>

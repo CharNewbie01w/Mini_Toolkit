@@ -11,6 +11,7 @@ class Launcher : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariantMap appList READ getAppList WRITE setAppList)
+    
 public:
     explicit Launcher(QObject *parent = nullptr);
     QVariantMap getAppList();
